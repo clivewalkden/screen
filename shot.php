@@ -38,7 +38,6 @@ if (!is_dir($cache)) {
 
 }
 
-
 $w = 1024;
 $h = 768;
 
@@ -48,6 +47,13 @@ if (isset($_REQUEST['w'])) {
 
 if (isset($_REQUEST['h'])) {
     $h = intval($_REQUEST['h']);
+}
+
+if (isset($_REQUEST['size']))
+{
+    $values = explode('x', $_REQUEST['size']);
+    $w = intval($values[0]);
+    $h = intval($values[1]);
 }
 
 if (isset($_REQUEST['clipw'])) {
@@ -102,10 +108,19 @@ if (!is_file($cache_job) or $refresh == true) {
     $src .= "
 
     page.open('{$url}', function () {
-        page.render('{$screen_file}');
-        phantom.exit();
+        page.evaluate(function() {
+          document.body.bgColor = 'white';
+        });
+
+        just_wait();
     });
 
+    function just_wait() {
+        setTimeout(function() {
+            page.render('{$screen_file}');
+            phantom.exit();
+        }, 2000);
+    }
 
     ";
 
@@ -147,4 +162,4 @@ if (is_file($cache_job)) {
 
 
 
- 
+
